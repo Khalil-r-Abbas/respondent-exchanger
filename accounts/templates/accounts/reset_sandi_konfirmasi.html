@@ -1,0 +1,41 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Buat Kata Sandi Baru{% endblock %}
+{% block lebar_pesan %}wadah-sempit{% endblock %}
+
+{% block konten %}
+<div class="wadah-sempit">
+    <section class="kartu">
+        <h1>Atur Kata Sandi Baru</h1>
+
+        {% if validlink %}
+            <p class="subjudul">Masukkan kata sandi baru untuk akun Anda.</p>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="grup-input">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="bantuan-input">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                            <ul class="daftar-error-field">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="tombol-utama tombol-penuh">Simpan Kata Sandi Baru</button>
+            </form>
+        {% else %}
+            <div class="kotak-pesan kotak-error">
+                Tautan reset kata sandi tidak valid atau sudah pernah digunakan. Silakan ajukan permintaan ulang.
+            </div>
+            <a href="{% url 'accounts:lupa_sandi' %}" class="tombol-utama">Ajukan Reset Ulang</a>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

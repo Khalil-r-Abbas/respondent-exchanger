@@ -1,0 +1,69 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Tabel Hak Akses per Peran{% endblock %}
+
+{% block gaya_tambahan %}
+<style>
+    .tabel-bungkus {
+        overflow-x: auto;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--garis-batas);
+        vertical-align: top;
+    }
+
+    th {
+        background-color: #FAF8F5;
+        color: var(--teks-judul);
+        font-weight: 600;
+        font-size: 13px;
+    }
+</style>
+{% endblock %}
+
+{% block konten %}
+<section class="kartu">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+        <div>
+            <h1>Tabel Hak Akses per Peran</h1>
+            <p class="subjudul" style="margin-bottom: 0;">Pembagian hak akses antara Pengunjung, Pengguna, dan Admin di Respondent Exchanger.</p>
+        </div>
+        <span class="lencana lencana-hijau">Peran Anda: {{ peran_saat_ini|title }}</span>
+    </div>
+
+    <div class="tabel-bungkus">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fitur / Halaman</th>
+                    <th>Pengunjung (Belum Login)</th>
+                    <th>Pengguna (Belum Verifikasi)</th>
+                    <th>Pengguna (Terverifikasi)</th>
+                    <th>Admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for baris in matriks_hak_akses %}
+                    <tr>
+                        <td><strong>{{ baris.fitur }}</strong></td>
+                        <td>{{ baris.pengunjung }}</td>
+                        <td>{{ baris.pengguna_belum_verifikasi }}</td>
+                        <td>{{ baris.pengguna_terverifikasi }}</td>
+                        <td>{{ baris.admin }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

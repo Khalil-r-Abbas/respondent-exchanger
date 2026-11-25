@@ -1,0 +1,123 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Dasbor Akun{% endblock %}
+
+{% block gaya_tambahan %}
+<style>
+    .kisi-ringkasan {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .kotak-metrik {
+        border: 1px solid var(--garis-batas);
+        border-radius: 12px;
+        padding: 16px;
+        background-color: #FAF8F5;
+    }
+
+    .label-metrik {
+        font-size: 13px;
+        color: var(--teks-redup);
+        margin-bottom: 4px;
+    }
+
+    .nilai-metrik {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--teks-judul);
+    }
+
+    .daftar-info {
+        margin: 24px 0 0;
+        border-top: 1px solid var(--garis-batas);
+    }
+
+    .baris-info {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--garis-batas);
+        font-size: 14px;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block konten %}
+<section class="kartu">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+        <div>
+            <h1>Halo, {{ user.username }}</h1>
+            <p class="subjudul" style="margin-bottom: 0;">Ringkasan akun dan hak akses Anda di Respondent Exchanger.</p>
+        </div>
+        {% if peran_pengguna == 'admin' %}
+            <span class="lencana lencana-hijau">Peran: Admin</span>
+        {% else %}
+            <span class="lencana lencana-netral">Peran: Pengguna</span>
+        {% endif %}
+    </div>
+
+    {% if not user.email_verified %}
+        <div class="kotak-pesan kotak-peringatan" style="margin-top: 20px;">
+            <strong>Email belum diverifikasi.</strong> Anda belum dapat menerbitkan kuesioner atau memperoleh poin sebelum memverifikasi email <code>{{ user.email }}</code>.
+            <form method="post" action="{% url 'accounts:kirim_ulang_verifikasi' %}" style="margin-top: 10px;">
+                {% csrf_token %}
+                <button type="submit" class="tombol-sekunder">Kirim Ulang Email Verifikasi</button>
+            </form>
+        </div>
+    {% endif %}
+
+    <div class="kisi-ringkasan">
+        <div class="kotak-metrik">
+            <div class="label-metrik">Total Poin Aktif</div>
+            <div class="nilai-metrik angka-tabular">{{ total_poin }} Poin</div>
+        </div>
+        <div class="kotak-metrik">
+            <div class="label-metrik">Status Verifikasi Email</div>
+            <div style="margin-top: 4px;">
+                {% if user.email_verified %}
+                    <span class="lencana lencana-hijau">Terverifikasi</span>
+                {% else %}
+                    <span class="lencana lencana-oranye">Belum Terverifikasi</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="kotak-metrik">
+            <div class="label-metrik">Status Akun</div>
+            <div style="margin-top: 4px;">
+                {% if user.is_blocked %}
+                    <span class="lencana lencana-merah">Diblokir</span>
+                {% else %}
+                    <span class="lencana lencana-hijau">Aktif</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="daftar-info">
+        <div class="baris-info">
+            <span style="color: var(--teks-redup);">Alamat Email</span>
+            <strong>{{ user.email }}</strong>
+        </div>
+        <div class="baris-info">
+            <span style="color: var(--teks-redup);">IP Terakhir</span>
+            <span class="angka-tabular">{{ user.last_ip|default:"-" }}</span>
+        </div>
+        <div class="baris-info">
+            <span style="color: var(--teks-redup);">Bergabung Sejak</span>
+            <span class="angka-tabular">{{ user.date_joined|date:"d M Y, H:i" }}</span>
+        </div>
+    </div>
+
+    <div class="baris-aksi">
+        <a href="{% url 'accounts:hak_akses' %}" class="tombol-sekunder">Lihat Tabel Hak Akses</a>
+        {% if user.is_staff or user.is_superuser %}
+            <a href="{% url 'accounts:panel_admin' %}" class="tombol-utama">Buka Panel Admin</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

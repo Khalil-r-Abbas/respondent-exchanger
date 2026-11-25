@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block judul_halaman %}Akun{% endblock %} — Respondent Exchanger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-halaman: #FAF8F5;
+            --bg-permukaan: #FFFFFF;
+            --warna-utama: #1B4332;
+            --warna-utama-hover: #143325;
+            --warna-aksen: #C2410C;
+            --warna-peringatan-bg: #FFF7ED;
+            --warna-peringatan-border: #FDBA74;
+            --warna-sukses-bg: #ECFDF5;
+            --warna-sukses-border: #A7F3D0;
+            --teks-judul: #1C1917;
+            --teks-isi: #44403C;
+            --teks-redup: #78716C;
+            --garis-batas: #E7E5E4;
+            --merah-error: #B91C1C;
+            --merah-error-bg: #FEF2F2;
+            --merah-error-border: #FECACA;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-halaman);
+            color: var(--teks-isi);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bilah-atas {
+            background-color: var(--bg-permukaan);
+            border-bottom: 1px solid var(--garis-batas);
+        }
+
+        .isi-bilah-atas {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .merek {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 24px;
+            color: var(--teks-judul);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+        }
+
+        .navigasi-atas {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .tautan-nav {
+            color: var(--teks-isi);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .tautan-nav:hover,
+        .tautan-nav:focus-visible {
+            background-color: #F5F5F4;
+            color: var(--teks-judul);
+            outline: none;
+        }
+
+        .wadah-utama {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 20px 64px;
+        }
+
+        .wadah-sempit {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .kartu {
+            background-color: var(--bg-permukaan);
+            border: 1px solid var(--garis-batas);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        h1, h2 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            color: var(--teks-judul);
+            line-height: 1.15;
+            margin: 0 0 8px;
+            letter-spacing: -0.01em;
+        }
+
+        h1 {
+            font-size: 32px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        .subjudul {
+            margin: 0 0 24px;
+            color: var(--teks-redup);
+            font-size: 15px;
+        }
+
+        .grup-input {
+            margin-bottom: 18px;
+        }
+
+        .grup-input label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--teks-judul);
+            margin-bottom: 6px;
+        }
+
+        .grup-input input[type="text"],
+        .grup-input input[type="email"],
+        .grup-input input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--teks-judul);
+            background-color: #FFFFFF;
+            border: 1px solid #D6D3D1;
+            border-radius: 10px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .grup-input input:focus {
+            outline: none;
+            border-color: var(--warna-utama);
+            box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.12);
+        }
+
+        .bantuan-input {
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--teks-redup);
+        }
+
+        .daftar-error-field {
+            margin: 6px 0 0;
+            padding: 0;
+            list-style: none;
+            color: var(--merah-error);
+            font-size: 13px;
+        }
+
+        .kotak-pesan {
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 18px;
+            border: 1px solid transparent;
+        }
+
+        .kotak-error {
+            background-color: var(--merah-error-bg);
+            border-color: var(--merah-error-border);
+            color: var(--merah-error);
+        }
+
+        .kotak-sukses {
+            background-color: var(--warna-sukses-bg);
+            border-color: var(--warna-sukses-border);
+            color: var(--warna-utama);
+        }
+
+        .kotak-peringatan {
+            background-color: var(--warna-peringatan-bg);
+            border-color: var(--warna-peringatan-border);
+            color: #9A3412;
+        }
+
+        .kotak-info {
+            background-color: #F5F5F4;
+            border-color: var(--garis-batas);
+            color: var(--teks-isi);
+        }
+
+        .tombol-utama {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 18px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            color: #FFFFFF;
+            background-color: var(--warna-utama);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+        }
+
+        .tombol-utama:hover,
+        .tombol-utama:focus-visible {
+            background-color: var(--warna-utama-hover);
+            outline: none;
+        }
+
+        .tombol-utama:active {
+            transform: translateY(1px);
+        }
+
+        .tombol-sekunder {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--teks-judul);
+            background-color: transparent;
+            border: 1px solid #D6D3D1;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .tombol-sekunder:hover,
+        .tombol-sekunder:focus-visible {
+            background-color: #F5F5F4;
+            border-color: #A8A29E;
+            outline: none;
+        }
+
+        .tombol-penuh {
+            width: 100%;
+        }
+
+        .lencana {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+        }
+
+        .lencana-hijau {
+            color: var(--warna-utama);
+            background-color: var(--warna-sukses-bg);
+            border-color: var(--warna-sukses-border);
+        }
+
+        .lencana-oranye {
+            color: #9A3412;
+            background-color: var(--warna-peringatan-bg);
+            border-color: var(--warna-peringatan-border);
+        }
+
+        .lencana-merah {
+            color: var(--merah-error);
+            background-color: var(--merah-error-bg);
+            border-color: var(--merah-error-border);
+        }
+
+        .lencana-netral {
+            color: var(--teks-isi);
+            background-color: #F5F5F4;
+            border-color: var(--garis-batas);
+        }
+
+        .baris-aksi {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+
+        .tautan-teks {
+            color: var(--warna-utama);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .tautan-teks:hover {
+            text-decoration: underline;
+        }
+
+        .angka-tabular {
+            font-variant-numeric: tabular-nums;
+        }
+
+        @media (max-width: 640px) {
+            .kartu {
+                padding: 20px;
+            }
+        }
+    </style>
+    {% block gaya_tambahan %}{% endblock %}
+</head>
+<body>
+    <header class="bilah-atas">
+        <div class="isi-bilah-atas">
+            <a href="{% url 'accounts:hak_akses' %}" class="merek">Respondent Exchanger</a>
+            <nav class="navigasi-atas" aria-label="Navigasi Akun">
+                <a href="{% url 'accounts:hak_akses' %}" class="tautan-nav">Tabel Hak Akses</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:dasbor' %}" class="tautan-nav">Dasbor</a>
+                    {% if user.is_staff or user.is_superuser %}
+                        <a href="{% url 'accounts:panel_admin' %}" class="tautan-nav">Panel Admin</a>
+                    {% endif %}
+                    <form method="post" action="{% url 'accounts:logout' %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="tombol-sekunder">Keluar</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="tautan-nav">Masuk</a>
+                    <a href="{% url 'accounts:daftar' %}" class="tombol-utama">Daftar</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="wadah-utama">
+        {% if messages %}
+            <div class="{% block lebar_pesan %}{% endblock %}">
+                {% for pesan in messages %}
+                    <div class="kotak-pesan {% if pesan.tags == 'error' %}kotak-error{% elif pesan.tags == 'success' %}kotak-sukses{% elif pesan.tags == 'warning' %}kotak-peringatan{% else %}kotak-info{% endif %}">
+                        {{ pesan }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block konten %}{% endblock %}
+    </main>
+</body>
+</html>

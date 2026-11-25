@@ -1,0 +1,16 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Kata Sandi Diperbarui{% endblock %}
+{% block lebar_pesan %}wadah-sempit{% endblock %}
+
+{% block konten %}
+<div class="wadah-sempit">
+    <section class="kartu">
+        <h1>Kata Sandi Berhasil Diubah</h1>
+        <div class="kotak-pesan kotak-sukses">
+            Kata sandi Anda telah diperbarui. Silakan masuk menggunakan kata sandi baru.
+        </div>
+        <a href="{% url 'accounts:login' %}" class="tombol-utama">Masuk ke Akun</a>
+    </section>
+</div>
+{% endblock %}

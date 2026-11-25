@@ -1,0 +1,19 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Tautan Reset Terkirim{% endblock %}
+{% block lebar_pesan %}wadah-sempit{% endblock %}
+
+{% block konten %}
+<div class="wadah-sempit">
+    <section class="kartu">
+        <h1>Periksa Email Anda</h1>
+        <div class="kotak-pesan kotak-sukses">
+            Jika alamat email tersebut terdaftar di sistem kami, tautan untuk mengatur ulang kata sandi telah dikirimkan.
+        </div>
+        <p class="subjudul" style="margin-bottom: 18px;">
+            Pada mode pengembangan lokal, isi email beserta tautan reset tercetak langsung di terminal server Django.
+        </p>
+        <a href="{% url 'accounts:login' %}" class="tombol-utama">Kembali ke Halaman Masuk</a>
+    </section>
+</div>
+{% endblock %}

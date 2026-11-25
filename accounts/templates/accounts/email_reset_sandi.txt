@@ -1,0 +1,8 @@
+Halo {{ user.get_username }},
+
+Anda meminta pengaturan ulang kata sandi untuk akun Respondent Exchanger Anda.
+Silakan buka tautan berikut untuk membuat kata sandi baru:
+
+{{ protocol }}://{{ domain }}{% url 'accounts:reset_sandi_konfirmasi' uidb64=uid token=token %}
+
+Jika Anda tidak merasa meminta pengaturan ulang kata sandi, abaikan email ini.
