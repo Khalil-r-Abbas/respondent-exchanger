@@ -213,3 +213,176 @@ class SeedDemoCommandTests(TestCase):
         self.assertEqual(Questionnaire.objects.count(), 8)
         self.assertGreaterEqual(Response.objects.count(), 6)
         self.assertGreaterEqual(PointLedger.objects.count(), 4)
+
+
+class PengisianDanPoinTests(TestCase):
+    def setUp(self):
+        self.pemilik = User.objects.create_user(
+            username='pemilik_uji',
+            email='pemilik_uji@example.com',
+            password='Password123!',
+            email_verified=True,
+        )
+        self.responden = User.objects.create_user(
+            username='responden_uji',
+            email='responden_uji@example.com',
+            password='Password123!',
+            email_verified=True,
+        )
+        self.belum_verifikasi = User.objects.create_user(
+            username='belum_verif',
+            email='belum_verif@example.com',
+            password='Password123!',
+            email_verified=False,
+        )
+        self.kuesioner = Questionnaire.objects.create(
+            owner=self.pemilik,
+            link_code='uji_pengisian_01',
+            title='Kuesioner Pengisian & Poin',
+            description='Uji alur pengisian dan timer server',
+            language=Questionnaire.Language.INDONESIAN,
+            status=Questionnaire.Status.PUBLISHED,
+            allow_anonymous=True,
+            seconds_per_question=10,
+            published_at=timezone.now(),
+            expires_at=timezone.now() + timedelta(days=2),
+        )
+        self.q1 = Question.objects.create(
+            questionnaire=self.kuesioner,
+            order=1,
+            question_type=Question.QuestionType.SINGLE_CHOICE,
+            text='Pilih satu opsi',
+            is_required=True,
+            options=['A', 'B'],
+        )
+        self.q2 = Question.objects.create(
+            questionnaire=self.kuesioner,
+            order=2,
+            question_type=Question.QuestionType.RATING,
+            text='Beri rating',
+            is_required=True,
+            rating_max=5,
+        )
+
+    def test_sesi_pengisian_dibuat_dan_dilanjutkan_dari_server(self):
+        self.client.force_login(self.responden)
+        url = f'/q/{self.kuesioner.link_code}/'
+
+        res1 = self.client.get(url)
+        self.assertEqual(res1.status_code, 200)
+        self.assertEqual(SubmissionSession.objects.count(), 1)
+        sesi_awal = SubmissionSession.objects.first()
+
+        # Membuka ulang halaman harus melanjutkan sesi yang sama, bukan membuat baru
+        res2 = self.client.get(url)
+        self.assertEqual(res2.status_code, 200)
+        self.assertEqual(SubmissionSession.objects.count(), 1)
+        self.assertEqual(res2.context['sesi_pengisian'].id, sesi_awal.id)
+        self.assertEqual(res2.context['batas_waktu_minimum'], 20)
+
+    def test_kirim_terlalu_cepat_tetap_simpan_tanpa_poin(self):
+        from core.points import compute_score
+
+        self.client.force_login(self.responden)
+        url = f'/q/{self.kuesioner.link_code}/'
+
+        self.client.get(url)
+        res_post = self.client.post(
+            url,
+            {
+                f'pertanyaan_{self.q1.id}': 'A',
+                f'pertanyaan_{self.q2.id}': '4',
+            },
+        )
+        self.assertRedirects(res_post, f'/q/{self.kuesioner.link_code}/selesai/')
+
+        respons = Response.objects.get(questionnaire=self.kuesioner, respondent=self.responden)
+        self.assertTrue(respons.is_too_fast)
+        self.assertFalse(respons.is_counted)
+        self.assertEqual(respons.points_awarded, 0)
+        self.assertEqual(Answer.objects.filter(response=respons).count(), 2)
+        self.assertEqual(PointLedger.objects.count(), 0)
+        self.assertEqual(compute_score(self.responden), 0)
+
+    def test_kirim_sesuai_waktu_mendapat_poin_dan_update_compute_score(self):
+        from core.points import compute_score
+
+        self.client.force_login(self.responden)
+        url = f'/q/{self.kuesioner.link_code}/'
+        self.client.get(url)
+
+        # Simulasikan waktu mulai di server sudah melewati batas minimum (20 detik)
+        sesi = SubmissionSession.objects.get(questionnaire=self.kuesioner, user=self.responden)
+        sesi.started_at = timezone.now() - timedelta(seconds=25)
+        sesi.save(update_fields=['started_at'])
+
+        res_post = self.client.post(
+            url,
+            {
+                f'pertanyaan_{self.q1.id}': 'B',
+                f'pertanyaan_{self.q2.id}': '5',
+            },
+        )
+        self.assertRedirects(res_post, f'/q/{self.kuesioner.link_code}/selesai/')
+
+        respons = Response.objects.get(questionnaire=self.kuesioner, respondent=self.responden)
+        self.assertFalse(respons.is_too_fast)
+        self.assertTrue(respons.is_counted)
+        self.assertEqual(respons.points_awarded, 2)
+        self.assertEqual(PointLedger.objects.filter(user=self.responden).count(), 1)
+        self.assertEqual(compute_score(self.responden), 2)
+
+        sesi.refresh_from_db()
+        self.assertEqual(sesi.status, SubmissionSession.SessionStatus.SUBMITTED)
+
+        # Pengisian ulang oleh pengguna yang sama harus ditolak
+        res_ulang = self.client.get(url)
+        self.assertEqual(res_ulang.context['status_akses'], 'sudah_mengisi')
+
+    def test_pemilik_dan_belum_verifikasi_tidak_mendapat_poin(self):
+        from core.points import compute_score
+
+        for pengguna in (self.pemilik, self.belum_verifikasi):
+            self.client.force_login(pengguna)
+            url = f'/q/{self.kuesioner.link_code}/'
+            self.client.get(url)
+            sesi = SubmissionSession.objects.get(questionnaire=self.kuesioner, user=pengguna)
+            sesi.started_at = timezone.now() - timedelta(seconds=30)
+            sesi.save(update_fields=['started_at'])
+
+            self.client.post(
+                url,
+                {
+                    f'pertanyaan_{self.q1.id}': 'A',
+                    f'pertanyaan_{self.q2.id}': '3',
+                },
+            )
+            self.assertEqual(compute_score(pengguna), 0)
+
+        self.assertEqual(PointLedger.objects.count(), 0)
+
+    def test_pengisian_anonim_tersimpan_tanpa_poin_dan_compute_score_abaikan_revoked(self):
+        from core.points import compute_score
+
+        url = f'/q/{self.kuesioner.link_code}/'
+        self.client.get(url)
+        sesi = SubmissionSession.objects.get(questionnaire=self.kuesioner, user__isnull=True)
+        sesi.started_at = timezone.now() - timedelta(seconds=30)
+        sesi.save(update_fields=['started_at'])
+
+        self.client.post(
+            url,
+            {
+                f'pertanyaan_{self.q1.id}': 'A',
+                f'pertanyaan_{self.q2.id}': '5',
+            },
+        )
+        respons_anonim = Response.objects.get(questionnaire=self.kuesioner, respondent__isnull=True)
+        self.assertFalse(respons_anonim.is_too_fast)
+        self.assertFalse(respons_anonim.is_counted)
+        self.assertEqual(respons_anonim.points_awarded, 0)
+
+        # Uji compute_score mengabaikan entri poin yang dicabut
+        PointLedger.objects.create(user=self.responden, points=3, is_revoked=False)
+        PointLedger.objects.create(user=self.responden, points=5, is_revoked=True)
+        self.assertEqual(compute_score(self.responden), 3)
