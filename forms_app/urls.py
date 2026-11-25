@@ -14,4 +14,6 @@ urlpatterns = [
     path('kuesioner/<int:pk>/duplicate/', views.questionnaire_duplicate, name='questionnaire_duplicate'),
     path('kuesioner/<int:pk>/delete/', views.questionnaire_delete, name='questionnaire_delete'),
     path('f/<str:link_code>/', views.public_questionnaire, name='public_questionnaire'),
+    path('q/<str:link_code>/', views.isi_kuesioner, name='isi_kuesioner'),
+    path('q/<str:link_code>/selesai/', views.selesai_pengisian, name='selesai_pengisian'),
 ]

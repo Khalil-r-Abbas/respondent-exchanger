@@ -1,4 +1,5 @@
 {% extends 'forms_app/base.html' %}
+{% load static %}
 
 {% block title %}{{ questionnaire.title }} - Respondent Exchange{% endblock %}
 
@@ -16,6 +17,24 @@
         {% if questionnaire.status == 'draft' %}<a class="button button-ghost" href="{% url 'forms_app:questionnaire_edit' questionnaire.pk %}">← Kembali edit</a><a class="button button-primary" href="{% url 'forms_app:questionnaire_publish' questionnaire.pk %}">Terbitkan kuesioner</a>{% endif %}
         {% if questionnaire.status == 'published' %}<span class="status-pill status-published">Kuesioner terbit dan terkunci</span>{% endif %}
     </div>
+    {% if questionnaire.status != 'draft' %}
+        {% url 'forms_app:isi_kuesioner' questionnaire.link_code as fill_path %}
+        <section class="share-card" aria-label="Bagikan kuesioner">
+            <div>
+                <p class="eyebrow">Bagikan ke responden</p>
+                <h2>Kode kuesioner</h2>
+                <p class="muted">Berikan kode ini atau gunakan tautan pengisian agar responden dapat mengisi kuesioner.</p>
+            </div>
+            <div class="share-code-row">
+                <code>{{ questionnaire.link_code }}</code>
+                <button class="button button-ghost button-small copy-button" type="button" data-copy="{{ questionnaire.link_code }}">Salin kode</button>
+            </div>
+            <div class="share-link-row">
+                <a href="{{ fill_path }}" target="_blank" rel="noopener">{{ request.scheme }}://{{ request.get_host }}{{ fill_path }}</a>
+                <button class="button button-primary button-small copy-button" type="button" data-copy="{{ request.scheme }}://{{ request.get_host }}{{ fill_path }}">Salin tautan</button>
+            </div>
+        </section>
+    {% endif %}
 {% endif %}
 
 <section class="preview-form" aria-label="Pratinjau pertanyaan">
@@ -37,3 +56,5 @@
     {% endfor %}
 </section>
 {% endblock %}
+
+{% block extra_scripts %}<script src="{% static 'forms_app/js/share.js' %}"></script>{% endblock %}

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ kuesioner.title }} — Respondent Exchanger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-halaman: #FAF8F5;
+            --bg-permukaan: #FFFFFF;
+            --warna-utama: #1B4332;
+            --warna-utama-hover: #143325;
+            --warna-aksen: #C2410C;
+            --warna-peringatan-bg: #FFF7ED;
+            --warna-peringatan-border: #FDBA74;
+            --teks-judul: #1C1917;
+            --teks-isi: #44403C;
+            --teks-redup: #78716C;
+            --garis-batas: #E7E5E4;
+            --merah-error: #B91C1C;
+            --merah-error-bg: #FEF2F2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-halaman);
+            color: var(--teks-isi);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+        }
+
+        .wadah-utama {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 32px 20px 64px;
+        }
+
+        .tajuk-kuesioner {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--garis-batas);
+        }
+
+        .lencana-bahasa {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--warna-utama);
+            background-color: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            font-size: 2.25rem;
+            line-height: 1.15;
+            color: var(--teks-judul);
+            margin: 0 0 10px;
+        }
+
+        .deskripsi-kuesioner {
+            margin: 0;
+            color: var(--teks-isi);
+            font-size: 0.98rem;
+        }
+
+        .meta-kuesioner {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 0.875rem;
+            color: var(--teks-redup);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .bilah-timer {
+            position: sticky;
+            top: 12px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            background-color: var(--bg-permukaan);
+            border: 1px solid var(--garis-batas);
+            border-radius: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .bilah-timer.sedang-menunggu {
+            background-color: var(--warna-peringatan-bg);
+            border-color: var(--warna-peringatan-border);
+        }
+
+        .status-timer-teks {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--teks-judul);
+        }
+
+        .angka-timer {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--warna-aksen);
+            white-space: nowrap;
+        }
+
+        .bilah-timer.siap-kirim .angka-timer {
+            color: var(--warna-utama);
+        }
+
+        .kotak-status {
+            background-color: var(--bg-permukaan);
+            border: 1px solid var(--garis-batas);
+            border-radius: 16px;
+            padding: 28px 24px;
+        }
+
+        .kotak-error-umum {
+            background-color: var(--merah-error-bg);
+            border: 1px solid #FECACA;
+            color: var(--merah-error);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+
+        .daftar-pertanyaan {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .kartu-pertanyaan {
+            background-color: var(--bg-permukaan);
+            border: 1px solid var(--garis-batas);
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+
+        .kartu-pertanyaan.ada-kesalahan {
+            border-color: #F87171;
+        }
+
+        .judul-pertanyaan {
+            display: block;
+            font-weight: 600;
+            color: var(--teks-judul);
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .tanda-wajib {
+            color: var(--warna-aksen);
+            margin-left: 4px;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #D6D3D1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--teks-judul);
+            background-color: #FFFFFF;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: 2px solid var(--warna-utama);
+            outline-offset: 1px;
+            border-color: var(--warna-utama);
+        }
+
+        .daftar-opsi {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item-opsi {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--teks-isi);
+        }
+
+        .skala-rating {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .opsi-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid #D6D3D1;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pesan-error-field {
+            margin: 8px 0 0;
+            color: var(--merah-error);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .area-aksi {
+            margin-top: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tombol-utama {
+            background-color: var(--warna-utama);
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .tombol-utama:hover {
+            background-color: var(--warna-utama-hover);
+        }
+
+        .tombol-utama:focus-visible {
+            outline: 2px solid var(--warna-aksen);
+            outline-offset: 2px;
+        }
+
+        .catatan-kaki {
+            font-size: 0.85rem;
+            color: var(--teks-redup);
+        }
+    </style>
+</head>
+<body>
+    <main class="wadah-utama">
+        <header class="tajuk-kuesioner">
+            <span class="lencana-bahasa">{{ kuesioner.get_language_display }}</span>
+            <h1>{{ kuesioner.title }}</h1>
+            {% if kuesioner.description %}
+                <p class="deskripsi-kuesioner">{{ kuesioner.description }}</p>
+            {% endif %}
+            {% if status_akses == 'bisa_isi' %}
+                <div class="meta-kuesioner">
+                    <span>{{ jumlah_pertanyaan }} pertanyaan</span>
+                    <span>Estimasi minimal: {{ batas_waktu_minimum }} detik</span>
+                    <span>Pembuat: {{ kuesioner.owner.username }}</span>
+                </div>
+            {% endif %}
+        </header>
+
+        {% if status_akses == 'tutup' %}
+            <section class="kotak-status">
+                <h2>Kuesioner Tidak Tersedia</h2>
+                <p>Kuesioner ini sudah ditutup atau melewati batas waktu pengisian.</p>
+            </section>
+        {% elif status_akses == 'wajib_login' %}
+            <section class="kotak-status">
+                <h2>Login Diperlukan</h2>
+                <p>Pembuat kuesioner ini mewajibkan responden untuk masuk ke akun terlebih dahulu sebelum mengisi.</p>
+            </section>
+        {% elif status_akses == 'sudah_mengisi' %}
+            <section class="kotak-status">
+                <h2>Respons Sudah Tercatat</h2>
+                <p>Anda sudah pernah mengisi kuesioner ini sebelumnya. Setiap responden hanya dapat mengirim satu respons.</p>
+            </section>
+        {% else %}
+            <div id="bilahTimer" class="bilah-timer {% if sisa_detik > 0 %}sedang-menunggu{% else %}siap-kirim{% endif %}">
+                <span id="statusTimerTeks" class="status-timer-teks">
+                    {% if sisa_detik > 0 %}
+                        Mohon baca dan isi dengan saksama. Waktu minimum agar poin dihitung:
+                    {% else %}
+                        Waktu minimum pengisian sudah terpenuhi. Anda dapat mengirim respons.
+                    {% endif %}
+                </span>
+                <span id="angkaTimer" class="angka-timer" data-sisa-detik="{{ sisa_detik }}">
+                    {% if sisa_detik > 0 %}{{ sisa_detik }} detik{% else %}Siap{% endif %}
+                </span>
+            </div>
+
+            {% if ada_error %}
+                <div class="kotak-error-umum" role="alert">
+                    Beberapa pertanyaan wajib belum diisi dengan benar. Silakan periksa kembali jawaban Anda.
+                </div>
+            {% endif %}
+
+            <form id="formPengisianKuesioner" method="post" novalidate>
+                {% csrf_token %}
+                <div class="daftar-pertanyaan">
+                    {% for baris in daftar_baris_pertanyaan %}
+                        {% with p=baris.pertanyaan %}
+                        <section class="kartu-pertanyaan {% if baris.error %}ada-kesalahan{% endif %}">
+                            <label class="judul-pertanyaan" for="id_pertanyaan_{{ p.id }}">
+                                {{ p.order }}. {{ p.text }}
+                                {% if p.is_required %}<span class="tanda-wajib" title="Wajib diisi">*</span>{% endif %}
+                            </label>
+
+                            {% if p.question_type == 'short_text' %}
+                                <input
+                                    type="text"
+                                    id="id_pertanyaan_{{ p.id }}"
+                                    name="pertanyaan_{{ p.id }}"
+                                    value="{{ baris.nilai }}"
+                                    placeholder="Tulis jawaban singkat Anda..."
+                                >
+                            {% elif p.question_type == 'long_text' %}
+                                <textarea
+                                    id="id_pertanyaan_{{ p.id }}"
+                                    name="pertanyaan_{{ p.id }}"
+                                    rows="4"
+                                    placeholder="Tulis jawaban lengkap Anda..."
+                                >{{ baris.nilai }}</textarea>
+                            {% elif p.question_type == 'single_choice' %}
+                                <div class="daftar-opsi">
+                                    {% for opsi in p.options %}
+                                        <label class="item-opsi">
+                                            <input
+                                                type="radio"
+                                                name="pertanyaan_{{ p.id }}"
+                                                value="{{ opsi }}"
+                                                {% if baris.nilai == opsi %}checked{% endif %}
+                                            >
+                                            <span>{{ opsi }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% elif p.question_type == 'multiple_choice' %}
+                                <div class="daftar-opsi">
+                                    {% for opsi in p.options %}
+                                        <label class="item-opsi">
+                                            <input
+                                                type="checkbox"
+                                                name="pertanyaan_{{ p.id }}"
+                                                value="{{ opsi }}"
+                                                {% if opsi in baris.nilai %}checked{% endif %}
+                                            >
+                                            <span>{{ opsi }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% elif p.question_type == 'dropdown' %}
+                                <select id="id_pertanyaan_{{ p.id }}" name="pertanyaan_{{ p.id }}">
+                                    <option value="">-- Pilih salah satu --</option>
+                                    {% for opsi in p.options %}
+                                        <option value="{{ opsi }}" {% if baris.nilai == opsi %}selected{% endif %}>{{ opsi }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% elif p.question_type == 'rating' %}
+                                <div class="skala-rating">
+                                    {% for angka in baris.daftar_rating %}
+                                        <label class="opsi-rating">
+                                            <input
+                                                type="radio"
+                                                name="pertanyaan_{{ p.id }}"
+                                                value="{{ angka }}"
+                                                {% if baris.nilai == angka|stringformat:"s" %}checked{% endif %}
+                                            >
+                                            <span>{{ angka }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% if baris.error %}
+                                <p class="pesan-error-field">{{ baris.error }}</p>
+                            {% endif %}
+                        </section>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+
+                <div class="area-aksi">
+                    <span class="catatan-kaki">
+                        {% if kuesioner.show_respondent_username and request.user.is_authenticated %}
+                            Username Anda ({{ request.user.username }}) akan terlihat oleh pembuat kuesioner.
+                        {% else %}
+                            Identitas jawaban dijaga sesuai pengaturan privasi kuesioner.
+                        {% endif %}
+                    </span>
+                    <button type="submit" class="tombol-utama">Kirim Jawaban</button>
+                </div>
+            </form>
+        {% endif %}
+    </main>
+
+    {% if status_akses == 'bisa_isi' %}
+    <script>
+        // Ambil sisa waktu awal yang dihitung dari jam server
+        const elemenAngkaTimer = document.getElementById('angkaTimer');
+        const elemenBilahTimer = document.getElementById('bilahTimer');
+        const elemenStatusTeks = document.getElementById('statusTimerTeks');
+        const formPengisian = document.getElementById('formPengisianKuesioner');
+
+        let sisaDetik = parseInt(elemenAngkaTimer.dataset.sisaDetik || '0', 10);
+
+        function perbaruiTampilanTimer() {
+            if (sisaDetik <= 0) {
+                elemenAngkaTimer.textContent = 'Siap';
+                elemenBilahTimer.classList.remove('sedang-menunggu');
+                elemenBilahTimer.classList.add('siap-kirim');
+                elemenStatusTeks.textContent = 'Waktu minimum pengisian sudah terpenuhi. Anda dapat mengirim respons.';
+                return;
+            }
+            elemenAngkaTimer.textContent = sisaDetik + ' detik';
+        }
+
+        if (sisaDetik > 0) {
+            const intervalTimer = setInterval(function () {
+                sisaDetik -= 1;
+                perbaruiTampilanTimer();
+                if (sisaDetik <= 0) {
+                    clearInterval(intervalTimer);
+                }
+            }, 1000);
+        }
+
+        // Tampilkan konfirmasi jika pengguna mencoba mengirim sebelum waktu minimum selesai
+        formPengisian.addEventListener('submit', function (event) {
+            if (sisaDetik > 0) {
+                const lanjutKirim = confirm(
+                    'Pengisian masih terlalu cepat (sisa ' + sisaDetik + ' detik). ' +
+                    'Jika dikirim sekarang, respons tetap tersimpan tetapi Anda tidak mendapat poin. Lanjutkan?'
+                );
+                if (!lanjutKirim) {
+                    event.preventDefault();
+                }
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

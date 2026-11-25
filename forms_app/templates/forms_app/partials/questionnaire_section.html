@@ -23,6 +23,12 @@
                     {% if kind == 'published' %}
                         <p class="expiry-note">Berakhir {{ item.expires_at|date:'d M Y, H:i' }}</p>
                     {% endif %}
+                    {% if kind != 'draft' %}
+                        <div class="code-row">
+                            <span>Kode: <code>{{ item.link_code }}</code></span>
+                            <button class="copy-button" type="button" data-copy="{{ item.link_code }}">Salin</button>
+                        </div>
+                    {% endif %}
                     <div class="card-actions">
                         {% if kind == 'draft' %}
                             <a class="button button-primary button-small" href="{% url 'forms_app:questionnaire_edit' item.pk %}">Lanjutkan</a>
