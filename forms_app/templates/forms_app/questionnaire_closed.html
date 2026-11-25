@@ -1,0 +1,13 @@
+{% extends 'forms_app/base.html' %}
+
+{% block title %}Kuesioner ditutup - Respondent Exchange{% endblock %}
+
+{% block content %}
+<section class="closed-card">
+    <div class="closed-icon">✓</div>
+    <p class="eyebrow">Kuesioner ditutup</p>
+    <h1>{{ questionnaire.title }}</h1>
+    <p class="muted">Kuesioner ini sudah tidak menerima respons baru. Data tetap tersimpan untuk pembuatnya.</p>
+    <a class="button button-primary" href="/">Kembali ke beranda</a>
+</section>
+{% endblock %}

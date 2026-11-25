@@ -1,0 +1,39 @@
+{% extends 'forms_app/base.html' %}
+
+{% block title %}{{ questionnaire.title }} - Respondent Exchange{% endblock %}
+
+{% block content %}
+<div class="breadcrumb"><a href="{% if request.user.is_authenticated and preview %}{% url 'forms_app:questionnaire_list' %}{% else %}/{% endif %}">{% if preview %}Kuesioner saya{% else %}Beranda{% endif %}</a><span>/</span><span>Pratinjau kuesioner</span></div>
+<section class="preview-hero">
+    <span class="language-pill">{{ questionnaire.get_language_display }}</span>
+    <h1>{{ questionnaire.title }}</h1>
+    {% if questionnaire.description %}<p>{{ questionnaire.description }}</p>{% endif %}
+    <div class="preview-meta"><span>{{ questionnaire.questions.count }} pertanyaan</span><span>Waktu minimal {{ minimum_seconds }} detik</span></div>
+</section>
+
+{% if preview %}
+    <div class="preview-actions">
+        {% if questionnaire.status == 'draft' %}<a class="button button-ghost" href="{% url 'forms_app:questionnaire_edit' questionnaire.pk %}">← Kembali edit</a><a class="button button-primary" href="{% url 'forms_app:questionnaire_publish' questionnaire.pk %}">Terbitkan kuesioner</a>{% endif %}
+        {% if questionnaire.status == 'published' %}<span class="status-pill status-published">Kuesioner terbit dan terkunci</span>{% endif %}
+    </div>
+{% endif %}
+
+<section class="preview-form" aria-label="Pratinjau pertanyaan">
+    {% for question in questionnaire.questions.all %}
+        <article class="preview-question">
+            <div class="question-number">{{ forloop.counter }}</div>
+            <div class="question-content">
+                <h2>{{ question.text }} {% if question.is_required %}<span class="required-mark">*</span>{% endif %}</h2>
+                {% if question.question_type == 'short_text' %}<input class="preview-input" type="text" placeholder="Jawaban singkat" disabled>
+                {% elif question.question_type == 'long_text' %}<textarea class="preview-input" rows="4" placeholder="Tulis jawabanmu" disabled></textarea>
+                {% elif question.question_type == 'single_choice' %}<div class="preview-options">{% for option in question.options %}<label><input type="radio" disabled> {{ option }}</label>{% endfor %}</div>
+                {% elif question.question_type == 'multiple_choice' %}<div class="preview-options">{% for option in question.options %}<label><input type="checkbox" disabled> {{ option }}</label>{% endfor %}</div>
+                {% elif question.question_type == 'dropdown' %}<select class="preview-input" disabled><option>Pilih jawaban</option>{% for option in question.options %}<option>{{ option }}</option>{% endfor %}</select>
+                {% elif question.question_type == 'rating' %}<div class="rating-preview"><span>1</span><div class="rating-dots"><i></i><i></i><i></i><i></i><i></i></div><span>{{ question.rating_max }}</span></div>{% endif %}
+            </div>
+        </article>
+    {% empty %}
+        <div class="empty-card"><p>Belum ada pertanyaan.</p></div>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'forms_app/base.html' %}
+{% load static %}
+
+{% block title %}{% if questionnaire %}Edit draf{% else %}Buat kuesioner{% endif %} - Respondent Exchange{% endblock %}
+
+{% block content %}
+<div class="breadcrumb"><a href="{% url 'forms_app:questionnaire_list' %}">Kuesioner saya</a><span>/</span><span>{% if questionnaire %}Edit draf{% else %}Buat kuesioner{% endif %}</span></div>
+<section class="page-hero compact-hero">
+    <div>
+        <p class="eyebrow">Pembuat kuesioner</p>
+        <h1>{% if questionnaire %}Rapikan drafmu{% else %}Buat kuesioner baru{% endif %}</h1>
+        <p class="muted">Isi informasi dasar, susun pertanyaan, lalu pratinjau sebelum diterbitkan.</p>
+    </div>
+</section>
+
+<form method="post" id="questionnaire-builder-form" novalidate>
+    {% csrf_token %}
+    {{ form.questions_json }}
+    {% for error in form.questions_json.errors %}<div class="form-errors">{{ error }}</div>{% endfor %}
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="builder-layout">
+        <div class="builder-main">
+            <section class="panel">
+                <div class="panel-heading"><div><p class="eyebrow">Langkah 1</p><h2>Informasi dasar</h2></div><span class="step-badge">01</span></div>
+                {% for field in form %}
+                    {% if field.name != 'questions_json' %}
+                        {% if field.name == 'allow_anonymous' or field.name == 'show_respondent_username' %}
+                            {# Render privacy toggles together below. #}
+                        {% else %}
+                            <div class="form-field {% if field.errors %}has-error{% endif %}">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                                {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                <div class="settings-grid">
+                    <label class="toggle-row {% if form.allow_anonymous.errors %}has-error{% endif %}">
+                        {{ form.allow_anonymous }}<span><strong>Izinkan pengisi anonim</strong><small>Pengunjung boleh menjawab tanpa akun.</small></span>
+                    </label>
+                    <label class="toggle-row {% if form.show_respondent_username.errors %}has-error{% endif %}">
+                        {{ form.show_respondent_username }}<span><strong>Tampilkan username pengisi</strong><small>Hanya terlihat bila pengisi masuk.</small></span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="panel" id="builder-root" data-initial-questions="{{ initial_questions_json|escapejs }}" data-max-questions="{{ max_questions }}">
+                <div class="panel-heading"><div><p class="eyebrow">Langkah 2</p><h2>Pertanyaan</h2><p class="muted">Tambahkan pertanyaan yang ingin dijawab responden.</p></div><span class="step-badge">02</span></div>
+                <div id="question-list" class="question-list"></div>
+                <div id="question-empty" class="question-empty"><span class="empty-icon">?</span><strong>Belum ada pertanyaan</strong><span>Mulai dari pertanyaan pertama kamu.</span></div>
+                <button type="button" class="add-question" id="add-question">+ Tambah pertanyaan</button>
+                <p class="builder-limit"><span id="question-count">0</span>/{{ max_questions }} pertanyaan</p>
+            </section>
+        </div>
+
+        <aside class="builder-sidebar">
+            <section class="panel sticky-panel">
+                <p class="eyebrow">Sebelum terbit</p>
+                <h2>Checklist</h2>
+                <ul class="checklist">
+                    <li><span>✓</span>Judul dan bahasa terisi</li>
+                    <li><span>✓</span>Minimal satu pertanyaan</li>
+                    <li><span>✓</span>Semua pertanyaan tervalidasi</li>
+                    <li><span>✓</span>Pratinjau sudah sesuai</li>
+                </ul>
+                <div class="sidebar-actions">
+                    <button class="button button-primary button-wide" type="submit">Simpan draf</button>
+                    <button class="button button-ghost button-wide" type="submit" name="save_and_preview" value="1">Simpan & pratinjau</button>
+                    {% if questionnaire %}<a class="button button-link button-wide" href="{% url 'forms_app:questionnaire_publish' questionnaire.pk %}">Lanjut ke terbitkan →</a>{% endif %}
+                </div>
+            </section>
+            <div class="tip-card"><strong>Tips</strong><p>Gunakan pertanyaan yang singkat dan jelas agar responden mudah memahami maksudnya.</p></div>
+        </aside>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}<script src="{% static 'forms_app/js/builder.js' %}"></script>{% endblock %}

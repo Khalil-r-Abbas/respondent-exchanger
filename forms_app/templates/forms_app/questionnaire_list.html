@@ -1,0 +1,24 @@
+{% extends 'forms_app/base.html' %}
+
+{% block title %}Kuesioner saya - Respondent Exchange{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div>
+        <p class="eyebrow">Ruang pembuat</p>
+        <h1>Kuesioner saya</h1>
+        <p class="muted">Kelola draf, kuesioner yang sedang berjalan, dan hasil yang sudah berakhir.</p>
+    </div>
+    <a class="button button-primary" href="{% url 'forms_app:questionnaire_new' %}">+ Buat kuesioner</a>
+</section>
+
+<section class="stat-grid" aria-label="Ringkasan kuesioner">
+    <div class="stat-card"><span class="stat-label">Draf</span><strong>{{ drafts|length }}/{{ draft_limit }}</strong><span class="stat-note">masih bisa dibuat</span></div>
+    <div class="stat-card"><span class="stat-label">Sedang terbit</span><strong>{{ published|length }}/{{ active_limit }}</strong><span class="stat-note">batas kuesioner aktif</span></div>
+    <div class="stat-card"><span class="stat-label">Berakhir</span><strong>{{ ended|length }}</strong><span class="stat-note">data tetap tersimpan</span></div>
+</section>
+
+{% include 'forms_app/partials/questionnaire_section.html' with heading='Draf' description='Kuesioner yang masih dapat diedit.' items=drafts kind='draft' empty_text='Belum ada draf kuesioner.' %}
+{% include 'forms_app/partials/questionnaire_section.html' with heading='Sedang terbit' description='Kuesioner yang sedang menerima respons.' items=published kind='published' empty_text='Belum ada kuesioner aktif.' %}
+{% include 'forms_app/partials/questionnaire_section.html' with heading='Berakhir atau ditutup' description='Kuesioner yang sudah kedaluwarsa atau ditutup.' items=ended kind='ended' empty_text='Belum ada kuesioner berakhir.' %}
+{% endblock %}
