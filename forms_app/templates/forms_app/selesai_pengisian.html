@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terima Kasih — {{ kuesioner.title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-halaman: #FAF8F5;
+            --bg-permukaan: #FFFFFF;
+            --warna-utama: #1B4332;
+            --warna-aksen: #C2410C;
+            --teks-judul: #1C1917;
+            --teks-isi: #44403C;
+            --teks-redup: #78716C;
+            --garis-batas: #E7E5E4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-halaman);
+            color: var(--teks-isi);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+        }
+
+        .wadah-utama {
+            max-width: 640px;
+            margin: 48px auto;
+            padding: 0 20px;
+        }
+
+        .kartu-ringkasan {
+            background-color: var(--bg-permukaan);
+            border: 1px solid var(--garis-batas);
+            border-radius: 16px;
+            padding: 32px 28px;
+        }
+
+        h1 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            font-size: 2rem;
+            color: var(--teks-judul);
+            margin: 0 0 8px;
+        }
+
+        .peringatan-cepat {
+            margin-top: 20px;
+            padding: 14px 16px;
+            background-color: #FFF7ED;
+            border: 1px solid #FDBA74;
+            border-radius: 10px;
+            color: #9A3412;
+            font-size: 0.94rem;
+        }
+
+        .info-poin {
+            margin-top: 20px;
+            padding: 14px 16px;
+            background-color: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            border-radius: 10px;
+            color: #1B4332;
+            font-size: 0.94rem;
+        }
+
+        .daftar-rincian {
+            margin-top: 24px;
+            border-top: 1px solid var(--garis-batas);
+            padding-top: 16px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            row-gap: 10px;
+            font-size: 0.92rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .label-rincian {
+            color: var(--teks-redup);
+        }
+
+        .nilai-rincian {
+            color: var(--teks-judul);
+            font-weight: 600;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <main class="wadah-utama">
+        <section class="kartu-ringkasan">
+            <h1>Terima kasih telah mengisi</h1>
+            <p>Respons Anda untuk kuesioner <strong>{{ kuesioner.title }}</strong> sudah tersimpan di server.</p>
+
+            {% if respons_terakhir %}
+                {% if respons_terakhir.is_too_fast %}
+                    <div class="peringatan-cepat" role="alert">
+                        <strong>Peringatan Terlalu Cepat:</strong>
+                        Pengisian diselesaikan dalam {{ respons_terakhir.duration_seconds }} detik
+                        (batas minimum {{ batas_waktu_minimum }} detik).
+                        Respons tetap dicatat, namun Anda tidak memperoleh poin untuk pengisian ini.
+                    </div>
+                {% elif respons_terakhir.is_counted and respons_terakhir.points_awarded > 0 %}
+                    <div class="info-poin">
+                        <strong>+{{ respons_terakhir.points_awarded }} Poin</strong> berhasil ditambahkan ke buku besar poin Anda.
+                    </div>
+                {% endif %}
+
+                <div class="daftar-rincian">
+                    <span class="label-rincian">Durasi pengisian (server)</span>
+                    <span class="nilai-rincian">{{ respons_terakhir.duration_seconds }} detik</span>
+
+                    <span class="label-rincian">Poin dari kuesioner ini</span>
+                    <span class="nilai-rincian">{{ respons_terakhir.points_awarded }} poin</span>
+
+                    {% if request.user.is_authenticated %}
+                        <span class="label-rincian">Total skor poin Anda saat ini</span>
+                        <span class="nilai-rincian">{{ total_skor_pengguna }} poin</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
