@@ -1,0 +1,46 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Respondent Exchange{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'forms_app/css/builder.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header class="site-header">
+        <div class="shell header-inner">
+            <a class="brand" href="{% url 'forms_app:questionnaire_list' %}">
+                <span class="brand-mark">R</span>
+                <span>respondent<span class="brand-accent">exchange</span></span>
+            </a>
+            <nav class="top-nav" aria-label="Navigasi utama">
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'forms_app:questionnaire_list' %}">Kuesioner saya</a>
+                    <span class="user-chip">@{{ request.user.username }}</span>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="shell main-content">
+        {% if messages %}
+            <div class="flash-stack">
+                {% for message in messages %}
+                    <div class="flash flash-{{ message.tags|default:'info' }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="shell footer-inner">
+            <span>Respondent Exchange</span>
+            <span>Platform pertukaran kuesioner</span>
+        </div>
+    </footer>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -32,6 +32,10 @@ SECRET_KEY = os.getenv(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('1', 'true', 'yes')
+DEV_AUTO_LOGIN = (
+    DEBUG
+    and os.getenv('DEV_AUTO_LOGIN', 'False').lower() in ('1', 'true', 'yes')
+)
 
 ALLOWED_HOSTS = [
     host.strip()

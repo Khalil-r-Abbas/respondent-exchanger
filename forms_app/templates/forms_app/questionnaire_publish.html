@@ -1,0 +1,29 @@
+{% extends 'forms_app/base.html' %}
+
+{% block title %}Terbitkan {{ questionnaire.title }} - Respondent Exchange{% endblock %}
+
+{% block content %}
+<div class="breadcrumb"><a href="{% url 'forms_app:questionnaire_edit' questionnaire.pk %}">Edit draf</a><span>/</span><span>Terbitkan</span></div>
+<div class="publish-layout">
+    <section class="panel publish-summary">
+        <p class="eyebrow">Langkah terakhir</p>
+        <h1>Terbitkan kuesioner</h1>
+        <p class="muted">Setelah diterbitkan, isi kuesioner tidak dapat diubah. Pastikan semua sudah sesuai.</p>
+        <div class="summary-card"><span class="language-pill">{{ questionnaire.get_language_display }}</span><h2>{{ questionnaire.title }}</h2><p>{{ questionnaire.questions.count }} pertanyaan · waktu minimal {{ minimum_seconds }} detik</p></div>
+        <h2 class="subheading">Konten yang dilarang</h2>
+        <ul class="restriction-list"><li>Permintaan data sensitif yang tidak diperlukan</li><li>Konten ilegal, kasar, atau merugikan</li><li>Spam atau tautan promosi berulang</li></ul>
+    </section>
+    <section class="panel publish-form-panel">
+        <h2>Pengaturan penerbitan</h2>
+        {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-field">{{ form.duration_days.label_tag }}{{ form.duration_days }}{% for error in form.duration_days.errors %}<span class="field-error">{{ error }}</span>{% endfor %}<small>Setelah waktu ini, tautan akan menampilkan halaman kuesioner ditutup.</small></div>
+            <label class="ack-row">{{ form.content_ack }}<span>{{ form.content_ack.label }}</span></label>
+            <label class="ack-row">{{ form.lock_ack }}<span>{{ form.lock_ack.label }}</span></label>
+            <button class="button button-primary button-wide" type="submit">Terbitkan sekarang</button>
+            <a class="button button-ghost button-wide" href="{% url 'forms_app:questionnaire_preview' questionnaire.pk %}">Kembali ke pratinjau</a>
+        </form>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+<section class="content-section">
+    <div class="section-heading">
+        <div>
+            <h2>{{ heading }}</h2>
+            <p class="muted">{{ description }}</p>
+        </div>
+        <span class="count-pill">{{ items|length }}</span>
+    </div>
+    {% if items %}
+        <div class="questionnaire-grid">
+            {% for item in items %}
+                <article class="questionnaire-card">
+                    <div class="card-topline">
+                        <span class="status-pill status-{{ kind }}">{% if kind == 'draft' %}Draf{% elif kind == 'published' %}Terbit{% else %}Berakhir{% endif %}</span>
+                        <span class="language-pill">{{ item.get_language_display }}</span>
+                    </div>
+                    <h3>{{ item.title }}</h3>
+                    <p class="card-description">{{ item.description|default:'Tanpa deskripsi.'|truncatechars:120 }}</p>
+                    <div class="card-meta">
+                        <span>{{ item.questions.count }} pertanyaan</span>
+                        <span>{{ item.response_count }} respons</span>
+                    </div>
+                    {% if kind == 'published' %}
+                        <p class="expiry-note">Berakhir {{ item.expires_at|date:'d M Y, H:i' }}</p>
+                    {% endif %}
+                    {% if kind != 'draft' %}
+                        <div class="code-row">
+                            <span>Kode: <code>{{ item.link_code }}</code></span>
+                            <button class="copy-button" type="button" data-copy="{{ item.link_code }}">Salin</button>
+                        </div>
+                    {% endif %}
+                    <div class="card-actions">
+                        {% if kind == 'draft' %}
+                            <a class="button button-primary button-small" href="{% url 'forms_app:questionnaire_edit' item.pk %}">Lanjutkan</a>
+                            <a class="button button-ghost button-small" href="{% url 'forms_app:questionnaire_preview' item.pk %}">Pratinjau</a>
+                        {% else %}
+                            <a class="button button-primary button-small" href="{% url 'forms_app:questionnaire_preview' item.pk %}">{% if kind == 'published' %}Lihat{% else %}Buka{% endif %}</a>
+                        {% endif %}
+                        {% if kind != 'draft' %}
+                            <form method="post" action="{% url 'forms_app:questionnaire_duplicate' item.pk %}">
+                                {% csrf_token %}
+                                <button class="button button-ghost button-small" type="submit">Duplikat</button>
+                            </form>
+                        {% endif %}
+                        <form method="post" action="{% url 'forms_app:questionnaire_delete' item.pk %}" onsubmit="return confirm('Hapus kuesioner ini beserta seluruh responsnya?');">
+                            {% csrf_token %}
+                            <button class="icon-button danger" type="submit" aria-label="Hapus {{ item.title }}">Hapus</button>
+                        </form>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-card">
+            <div class="empty-icon">□</div>
+            <p>{{ empty_text }}</p>
+            {% if kind == 'draft' %}<a href="{% url 'forms_app:questionnaire_new' %}">Mulai buat kuesioner</a>{% endif %}
+        </div>
+    {% endif %}
+</section>
