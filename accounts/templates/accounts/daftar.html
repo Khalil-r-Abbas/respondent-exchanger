@@ -1,0 +1,49 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Daftar Akun{% endblock %}
+{% block lebar_pesan %}wadah-sempit{% endblock %}
+
+{% block konten %}
+<div class="wadah-sempit">
+    <section class="kartu">
+        <h1>Buat Akun Baru</h1>
+        <p class="subjudul">Gunakan alamat email aktif Anda. Layanan email sekali pakai tidak diizinkan.</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form_daftar.non_field_errors %}
+                <div class="kotak-pesan kotak-error">
+                    {% for error in form_daftar.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form_daftar %}
+                <div class="grup-input">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="bantuan-input">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="daftar-error-field">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="tombol-utama tombol-penuh">Daftar Sekarang</button>
+        </form>
+
+        <div class="baris-aksi">
+            <span>Sudah punya akun?</span>
+            <a href="{% url 'accounts:login' %}" class="tautan-teks">Masuk ke Akun</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

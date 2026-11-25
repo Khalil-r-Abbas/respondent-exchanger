@@ -1,0 +1,47 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Masuk{% endblock %}
+{% block lebar_pesan %}wadah-sempit{% endblock %}
+
+{% block konten %}
+<div class="wadah-sempit">
+    <section class="kartu">
+        <h1>Masuk ke Akun</h1>
+        <p class="subjudul">Masukkan username atau email yang sudah terdaftar untuk melanjutkan.</p>
+
+        {% if pesan_error %}
+            <div class="kotak-pesan kotak-error" role="alert">
+                {{ pesan_error }}
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if tujuan_berikutnya %}
+                <input type="hidden" name="next" value="{{ tujuan_berikutnya }}">
+            {% endif %}
+
+            {% for field in form_login %}
+                <div class="grup-input">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="daftar-error-field">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="tombol-utama tombol-penuh">Masuk</button>
+        </form>
+
+        <div class="baris-aksi">
+            <a href="{% url 'accounts:lupa_sandi' %}" class="tautan-teks">Lupa kata sandi?</a>
+            <a href="{% url 'accounts:daftar' %}" class="tautan-teks">Buat akun baru</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

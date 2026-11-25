@@ -1,0 +1,36 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Lupa Kata Sandi{% endblock %}
+{% block lebar_pesan %}wadah-sempit{% endblock %}
+
+{% block konten %}
+<div class="wadah-sempit">
+    <section class="kartu">
+        <h1>Reset Kata Sandi</h1>
+        <p class="subjudul">Masukkan email akun Anda untuk menerima tautan pengaturan ulang kata sandi.</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="grup-input">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="daftar-error-field">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="tombol-utama tombol-penuh">Kirim Tautan Reset</button>
+        </form>
+
+        <div class="baris-aksi">
+            <a href="{% url 'accounts:login' %}" class="tautan-teks">Kembali ke Halaman Masuk</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

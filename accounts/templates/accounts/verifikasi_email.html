@@ -1,0 +1,23 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Verifikasi Email{% endblock %}
+{% block lebar_pesan %}wadah-sempit{% endblock %}
+
+{% block konten %}
+<div class="wadah-sempit">
+    <section class="kartu">
+        <h1>{% if berhasil %}Email Terverifikasi{% else %}Verifikasi Gagal{% endif %}</h1>
+        <div class="kotak-pesan {% if berhasil %}kotak-sukses{% else %}kotak-error{% endif %}">
+            {{ pesan_hasil }}
+        </div>
+
+        <div class="baris-aksi">
+            {% if user.is_authenticated %}
+                <a href="{% url 'accounts:dasbor' %}" class="tombol-utama">Buka Dasbor</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="tombol-utama">Masuk ke Akun</a>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "accounts/base_akun.html" %}
+
+{% block judul_halaman %}Panel Admin{% endblock %}
+
+{% block gaya_tambahan %}
+<style>
+    .kisi-stat {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin: 20px 0 28px;
+    }
+
+    .kartu-stat {
+        border: 1px solid var(--garis-batas);
+        border-radius: 12px;
+        padding: 16px;
+        background-color: #FAF8F5;
+    }
+
+    .tabel-bungkus {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--garis-batas);
+        white-space: nowrap;
+    }
+
+    th {
+        color: var(--teks-redup);
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+</style>
+{% endblock %}
+
+{% block konten %}
+<section class="kartu">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div>
+            <h1>Panel Admin Akun</h1>
+            <p class="subjudul" style="margin-bottom: 0;">Halaman ini hanya dapat diakses oleh pengguna dengan peran Admin.</p>
+        </div>
+        <a href="/admin/" class="tombol-utama">Buka Django Admin</a>
+    </div>
+
+    <div class="kisi-stat">
+        <div class="kartu-stat">
+            <div style="font-size: 13px; color: var(--teks-redup);">Total Pengguna</div>
+            <div class="angka-tabular" style="font-size: 24px; font-weight: 700; color: var(--teks-judul);">{{ total_pengguna }}</div>
+        </div>
+        <div class="kartu-stat">
+            <div style="font-size: 13px; color: var(--teks-redup);">Email Terverifikasi</div>
+            <div class="angka-tabular" style="font-size: 24px; font-weight: 700; color: var(--warna-utama);">{{ pengguna_terverifikasi }}</div>
+        </div>
+        <div class="kartu-stat">
+            <div style="font-size: 13px; color: var(--teks-redup);">Akun Diblokir</div>
+            <div class="angka-tabular" style="font-size: 24px; font-weight: 700; color: var(--merah-error);">{{ pengguna_diblokir }}</div>
+        </div>
+        <div class="kartu-stat">
+            <div style="font-size: 13px; color: var(--teks-redup);">Jumlah Admin</div>
+            <div class="angka-tabular" style="font-size: 24px; font-weight: 700; color: var(--teks-judul);">{{ total_admin }}</div>
+        </div>
+    </div>
+
+    <h2>10 Pengguna Terbaru</h2>
+    <div class="tabel-bungkus">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Peran</th>
+                    <th>Verifikasi</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for akun in daftar_pengguna_terbaru %}
+                    <tr>
+                        <td><strong>{{ akun.username }}</strong></td>
+                        <td>{{ akun.email }}</td>
+                        <td>
+                            {% if akun.is_staff or akun.is_superuser %}
+                                <span class="lencana lencana-hijau">Admin</span>
+                            {% else %}
+                                <span class="lencana lencana-netral">Pengguna</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if akun.email_verified %}
+                                <span class="lencana lencana-hijau">Terverifikasi</span>
+                            {% else %}
+                                <span class="lencana lencana-oranye">Belum</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if akun.is_blocked %}
+                                <span class="lencana lencana-merah">Diblokir</span>
+                            {% else %}
+                                <span class="lencana lencana-hijau">Aktif</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
